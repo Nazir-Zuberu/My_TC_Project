@@ -25,7 +25,7 @@ new_data = spark.read.jdbc(url=postgres_url, table=postgres_table_name, properti
 
 # Filter new data based on the maximum existing id
 #incremental_data = new_data.filter(col("Time") > max_existing_time)
-incremental_data = new_data.substract(existing_hive_data)
+incremental_data = new_data.subtract(existing_hive_data)
 
 
 
