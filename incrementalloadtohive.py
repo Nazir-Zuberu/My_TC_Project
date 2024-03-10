@@ -14,23 +14,27 @@ postgres_properties = {
     "driver": "org.postgresql.Driver",
 }
 postgres_table_name = "nazir_iload"
-
+  
 # 2. Load new data dataset from PostgresSQL:
 new_data = spark.read.jdbc(url=postgres_url, table=postgres_table_name, properties=postgres_properties)
 
 
 # Max time from existing hive table
-max_existing_time = existing_hive_data.selectExpr("max(Time) as max_time").collect()[0]["max_time"]
+#max_existing_time = existing_hive_data.selectExpr("max(Time) as max_time").collect()[0]["max_time"]
 
 
 # Filter new data based on the maximum existing id
-incremental_data = new_data.filter(col("Time") > max_existing_time)
+#incremental_data = new_data.filter(col("Time") > max_existing_time)
+incremental_data = new_data.substract(existing_hive_data)
+
+
 
 # Append incremental data to existing data
-updated_data = existing_hive_data.union(incremental_data)
+#updated_data = existing_hive_data.union(incremental_data)
 
 # Write updated data to Hive table
-updated_data.write.mode("overwrite").saveAsTable("nazir_db.nazir_hive")
+#updated_data.write.mode("overwrite").saveAsTable("nazir_db.nazir_hive")
+incremental_data.write.mode("append").saveAsTable("nazir_db.nazir_hive")
 
 # Stop SparkSession
 spark.stop()
